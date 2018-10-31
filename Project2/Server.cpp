@@ -1,20 +1,22 @@
+#pragma comment(lib, "Ws2_32.lib")
+#include <winsock2.h> 
+#include <ws2tcpip.h>
 #include <inaddr.h>
 #include <direct.h>
 #include <fstream>
 #include <sstream>
 #include "Server.h"
-#pragma comment(lib, "ws_32.lib")
+#pragma warning(disable : 4996)
 
 Server::Server() {
 
-    adjustWsaData();
-    adjustListeningSocket();
-    bindSocketHint();
+	adjustWsaData();
+	adjustListeningSocket();
+	bindSocketHint();
 }
-Server::~Server() {
 
-	//    closesocket(listeningSocket);
-	//    WSACleanup();
+Server::~Server()
+{
 }
 
 void Server::adjustWsaData() {
@@ -67,14 +69,12 @@ void Server::dumpLog() {
 	GetSystemTime(&system_time);
 
 	std::stringstream stringStream;
-	stringStream << current_work_dir << "\\tmp" << "\\" << system_time.wDay << "_" << system_time.wMonth << "_"
-		<< system_time.wYear << " at time " << system_time.wHour << "_" << system_time.wMinute << " log.txt";
+	stringStream << current_work_dir  << "\\" << system_time.wDay << "_" << system_time.wMonth << "_"<< system_time.wYear << " at time " << system_time.wHour << "_" << system_time.wMinute << " log.txt";
 	std::string filePath = stringStream.str();
-
 
 	std::ofstream fout;
 	fout.open(filePath);
-	for (int i; i < buffer.size(); i++) {
+	for (int i = 0; i < buffer.size(); i++) {
 		fout << buffer[i];
 	}
 	fout.close();
@@ -88,14 +88,14 @@ void Server::start() {
 	while (isActive) {
 		sockaddr_in clientSocketHint;
 		int clientSocketHintSize = sizeof(clientSocketHint);
-		SOCKET  clientSocket = accept(listeningSocket, (sockaddr *)&clientSocketHint, &clientSocketHintSize);
+		SOCKET clientSocket = accept(listeningSocket, (sockaddr *)&clientSocketHint, &clientSocketHintSize);
 		if (clientSocket == INVALID_SOCKET) {
 			std::cerr << "Client could't connect, Err #" << WSAGetLastError() << std::endl;
 		}
 		char *clientIP = inet_ntoa(clientSocketHint.sin_addr);
 		Connection *connection = new Connection(clientSocket, clientIP);
 		connections.push_back(connection);
-		std::thread connectionThread(&Connection::clientProcessing, std::ref(connection));
+		std::thread connectionThread(&Connection::clientProcessing, connection);
 		connectionThread.detach();
 	}
 }
