@@ -60,7 +60,7 @@ int startClient() {
 	hint.sin_addr.S_un.S_addr = inet_addr(ipAddress.c_str());
 
 	//Do-while loop to send and receive data
-	char buffer[5000];
+	char buffer[1000];
 	string userInput = generateRandomString();
 
 

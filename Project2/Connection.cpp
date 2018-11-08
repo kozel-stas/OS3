@@ -18,9 +18,9 @@ void Connection::addMessage(std::string message) {
 }
 
 void Connection::threadTimer(std::string threadId) {
-
-	while (isActive) {
-		std::string timerData = getPreamble() + IP + " idle\n";
+	// нарушение прав на чтение wtf? ip не определен?
+	while (isActive == 1) {
+		std::string timerData = getInfo() + " 127.0.0.1"  + " idle\n";
 		std::cout << timerData;
 		addMessage(timerData);
 		Sleep(1000);
@@ -35,30 +35,27 @@ std::string Connection::idToString() {
 
 void Connection::clientProcessing() {
 
-	std::string connectionMessage = getPreamble() + "accept new client " + IP + "\n";
-	std::cout << connectionMessage;
-	addMessage(connectionMessage);
-
 	std::thread timerThread(&Connection::threadTimer, this, idToString());
 	timerThread.detach();
+	std::string connectionMessage = getInfo() + "accept new client " + IP + "\n";
+	std::cout << connectionMessage;
+	addMessage(connectionMessage);
 
 	while (isActive) {
 		char clientMessage[10000];
 		int bytesReceived = recv(clientSocket, clientMessage, 1000, 0);
-		if (bytesReceived == SOCKET_ERROR) {
+	
+		if (bytesReceived == -1 || bytesReceived == 0) {
 			setIsActive(false);
-		}
-		else if (bytesReceived == 0) {
-			setIsActive(false);
-			connectionMessage = getPreamble() + "client " + IP + " disconnected\n";
+			connectionMessage = getInfo() + "client " + IP + " disconnected\n";
 			std::cout << connectionMessage;
 			addMessage(connectionMessage);
 		}
 		else {
-			connectionMessage = getPreamble() + IP + " " + std::string(clientMessage, 0, bytesReceived) + "\n";
+			connectionMessage = getInfo() + IP + " " + std::string(clientMessage, 0, bytesReceived) + "\n";
 			std::cout << connectionMessage;
 			addMessage(connectionMessage);
-			send(clientSocket, clientMessage, bytesReceived + 1, 0);
+			send(clientSocket, clientMessage, bytesReceived + 1, 0); //write data to socket 1-socket-descriptor 2-address 3 - buffer length
 		}
 	}
 	delete this;
@@ -72,7 +69,7 @@ void Connection::closeSocket() {
 	closesocket(clientSocket);
 }
 
-std::string Connection::getPreamble() {
+std::string Connection::getInfo() {
 	std::string preamble = getCurrentTime() + "[" + idToString() + "]: ";
 	return preamble;
 }

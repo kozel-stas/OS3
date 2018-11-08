@@ -21,21 +21,25 @@ Server::~Server()
 
 void Server::adjustWsaData() {
 
-	int wsaStartup = WSAStartup(winsSockVersion, &winSockData);
+	int wsaStartup = WSAStartup(ver, &wsData);
 	if (wsaStartup != 0) {
 		std::cerr << "Can't initialize winSock, Err #" << WSAGetLastError() << std::endl;
+		return;
 	}
 }
 
 void Server::adjustListeningSocket() {
 
-	listeningSocket = socket(AF_INET, SOCK_STREAM, 0);
+	listeningSocket = socket(AF_INET, SOCK_STREAM, 0); // AF_INET - IPv4, SOCK_STREAM - USE FOR TCP, 0 - means that we use default protocol
 	if (listeningSocket == INVALID_SOCKET) {
 		std::cerr << "Can't create a listening socket, Err #" << WSAGetLastError() << std::endl;
+		return;
 	}
 }
 
 void Server::bindSocketHint() {
+
+	// bind the ip address and port to a socket
 
 	sockaddr_in listeningSocketHint;
 	listeningSocketHint.sin_family = AF_INET;
@@ -44,7 +48,7 @@ void Server::bindSocketHint() {
 	bind(listeningSocket, (sockaddr *)&listeningSocketHint, sizeof(listeningSocketHint));
 }
 
-Server& Server::getInstance() {
+Server& Server::getInstance() { // return reference for data type Server, which initialized in main.cpp
 	static Server server;
 	return server;
 }
@@ -64,7 +68,6 @@ void Server::stopServer() {
 void Server::dumpLog() {
 	char current_work_dir[FILENAME_MAX];
 	_getcwd(current_work_dir, sizeof(current_work_dir));
-
 	SYSTEMTIME system_time;
 	GetSystemTime(&system_time);
 
@@ -75,7 +78,8 @@ void Server::dumpLog() {
 	std::ofstream fout;
 	fout.open(filePath);
 	for (int i = 0; i < buffer.size(); i++) {
-		fout << buffer[i];
+		std::cout << buffer[i];
+		fout << buffer[i];	
 	}
 	fout.close();
 	std::cout << filePath << std::endl;
@@ -83,18 +87,19 @@ void Server::dumpLog() {
 }
 
 void Server::start() {
-	listen(listeningSocket, SOMAXCONN);
+	listen(listeningSocket, SOMAXCONN); //В константе SOMAXCONN хранится максимально возможное число одновременных TCP-соединений
 	isActive = true;
 	while (isActive) {
 		sockaddr_in clientSocketHint;
 		int clientSocketHintSize = sizeof(clientSocketHint);
-		SOCKET clientSocket = accept(listeningSocket, (sockaddr *)&clientSocketHint, &clientSocketHintSize);
+		SOCKET clientSocket = accept(listeningSocket, (sockaddr *)&clientSocketHint, &clientSocketHintSize); //Функция accept ожидает запрос на установку TCP-соединения от удаленного хоста. В качестве аргумента ей передается дескриптор слушающего сокета.
+																											// При успешной установке TCP - соединения, для него создается новый сокет.Функция accept возвращает дескриптор этого сокета.
 		if (clientSocket == INVALID_SOCKET) {
 			std::cerr << "Client could't connect, Err #" << WSAGetLastError() << std::endl;
 		}
 		char *clientIP = inet_ntoa(clientSocketHint.sin_addr);
 		Connection *connection = new Connection(clientSocket, clientIP);
-		connections.push_back(connection);
+		connections.push_back(connection); // добавление элемента в конец вектора коннектов
 		std::thread connectionThread(&Connection::clientProcessing, connection);
 		connectionThread.detach();
 	}
@@ -102,24 +107,25 @@ void Server::start() {
 
 void Server::addMessage(std::string message) {
 	mutex.lock();
-	buffer.push_back(message);
+	buffer.push_back(message); // add message to the end of vectors array
 	mutex.unlock();
 }
 
 void Server::deleteConnection(Connection *connection) {
-	mutex.lock();
+	 mutex.lock();
 	for (std::vector<Connection*>::iterator eraseIterator = connections.begin(); eraseIterator < connections.end(); eraseIterator++) {
 		if (*eraseIterator == connection) {
 			connections.erase(eraseIterator);
+			break;
 		}
-	}
+	} 
 	mutex.unlock();
 }
 
 void Server::shutDownAllConnections() {
-	mutex.lock();
+	 mutex.lock();
 	for (int connectionIndex = 0; connectionIndex < connections.size(); connectionIndex++) {
 		connections[connectionIndex]->closeSocket();
 	}
-	mutex.unlock();
+	 mutex.unlock();
 }

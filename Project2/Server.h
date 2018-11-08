@@ -13,10 +13,10 @@ class Server {
 
 private:
 
-	WSADATA winSockData;
+	WSADATA wsData;
 	const int VERSION = 2;
 	const int MODIFICATION = 2;
-	WORD winsSockVersion = MAKEWORD(VERSION, MODIFICATION);
+	WORD ver = MAKEWORD(VERSION, MODIFICATION);
 	const int PORT = 5223;
 	SOCKET listeningSocket;
 
