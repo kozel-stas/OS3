@@ -19,7 +19,7 @@ const char *ar[] = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
 
 int getRandomSleepTime() {
 	int sleepTime = rand() % 10 + 2;
-	return sleepTime;
+	return sleepTime * 1000; // to mili???
 }
 
 string generateRandomString() {
@@ -59,8 +59,7 @@ int startClient(const char *ip) {
 	hint.sin_port = htons(port);
 	hint.sin_addr.S_un.S_addr = inet_addr(ip);
 
-	//Do-while loop to send and receive data
-	char buffer[1000];
+	char buffer[10000];
 	string userInput = generateRandomString();
 
 
@@ -81,7 +80,8 @@ int startClient(const char *ip) {
 
 	if (sendResult != SOCKET_ERROR) {
 		//Wait for response
-		ZeroMemory(buffer, 5000);
+		ZeroMemory(buffer, 10000);
+	
 		int byteReceived = recv(clientSocket, buffer, 5000, 0);
 		if (byteReceived > 0) {
 			//Echo response to console
@@ -91,7 +91,7 @@ int startClient(const char *ip) {
 
 	random = getRandomSleepTime();
 	Sleep(random);
-	
+
 	closesocket(clientSocket);
 	WSACleanup();
 	return 0;
