@@ -3,6 +3,6 @@
   main.cpp
   Server.cpp
 c:\users\vlads\source\repos\project2\project2\server.cpp(80): warning C4018: <: несоответствие типов со знаком и без знака
-c:\users\vlads\source\repos\project2\project2\server.cpp(127): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\vlads\source\repos\project2\project2\server.cpp(128): warning C4018: <: несоответствие типов со знаком и без знака
   Создание кода...
   Project2.vcxproj -> C:\Users\vlads\source\repos\Project2\Debug\Server.exe

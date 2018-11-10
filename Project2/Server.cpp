@@ -53,7 +53,6 @@ Server& Server::getInstance() { // return reference for data type Server, which 
 	return server;
 }
 void Server::interruption_handler(int param) {
-	system("cls");
 	getInstance().stopServer();
 	system("Pause");
 	exit(0);
@@ -66,8 +65,8 @@ void Server::stopServer() {
 }
 
 void Server::dumpLog() {
-	char current_work_dir[FILENAME_MAX];
-	_getcwd(current_work_dir, sizeof(current_work_dir));
+	char current_work_dir[FILENAME_MAX]; // array for 260 symbols - max
+	_getcwd(current_work_dir, sizeof(current_work_dir)); // copy path to current diretcory to current_work_dir variable, if it is not more then sizeof length
 	SYSTEMTIME system_time;
 	GetSystemTime(&system_time);
 
@@ -77,10 +76,12 @@ void Server::dumpLog() {
 
 	std::ofstream fout;
 	fout.open(filePath);
+	mutex.lock();
 	for (int i = 0; i < buffer.size(); i++) {
 		std::cout << buffer[i];
 		fout << buffer[i];	
 	}
+	mutex.unlock();
 	fout.close();
 	std::cout << filePath << std::endl;
 

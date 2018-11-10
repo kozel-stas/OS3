@@ -2,7 +2,7 @@
 #include "signal.h"
 
 using namespace std;
-BOOL WINAPI ConsoleHandler(DWORD);
+
 
 int main() {
 	//    server->start();

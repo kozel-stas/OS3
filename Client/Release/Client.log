@@ -1,0 +1,6 @@
+﻿  main.cpp
+c:\users\vlads\source\repos\project2\client\main.cpp(25): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  Создание кода
+c:\users\vlads\source\repos\project2\client\main.cpp(84): error C4789: буфер "buffer" размером 1000 байт будет переполнен; 5000 будет записано начиная с позиции 0
+  All 97 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+LINK : fatal error LNK1257: не удалось создать код

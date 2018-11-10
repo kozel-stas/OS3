@@ -31,7 +31,7 @@ string generateRandomString() {
 
 
 int startClient() {
-	string ipAddress = "127.0.0.1";
+	string ipAddress = "192.168.38.49";
 	int port = 5223;
 	//    std::cout << "Input IP address" << std::endl;
 	//    cin >> ipAddress;
@@ -55,7 +55,7 @@ int startClient() {
 
 	//Fill in a hint structure
 	sockaddr_in hint;
-	hint.sin_family = AF_INET;
+	hint.sin_family = AF_INET; // we use AF_INET for ip
 	hint.sin_port = htons(port);
 	hint.sin_addr.S_un.S_addr = inet_addr(ipAddress.c_str());
 
@@ -91,7 +91,7 @@ int startClient() {
 
 	random = getRandomSleepTime();
 	Sleep(random);
-	//Gracefully close down everything
+	
 	closesocket(clientSocket);
 	WSACleanup();
 	return 0;

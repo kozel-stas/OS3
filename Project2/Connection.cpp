@@ -50,8 +50,7 @@ void Connection::clientProcessing() {
 			connectionMessage = getInfo() + "client " + IP + " disconnected\n";
 			std::cout << connectionMessage;
 			addMessage(connectionMessage);
-		}
-		else {
+		} else {
 			connectionMessage = getInfo() + IP + " " + std::string(clientMessage, 0, bytesReceived) + "\n";
 			std::cout << connectionMessage;
 			addMessage(connectionMessage);

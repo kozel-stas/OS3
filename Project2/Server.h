@@ -38,15 +38,6 @@ private:
 
 public:
 
-	Server(const Server&) = delete;
-	Server operator=(const Server&) = delete;
-
-	void* operator new(std::size_t) = delete;
-	void* operator new[](std::size_t) = delete;
-
-	void operator delete(void*) = delete;
-	void operator delete[](void*) = delete;
-
 	static Server& getInstance();
 
 	void start();
