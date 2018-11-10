@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <mutex>
-#include <chrono>
 #include <thread>
 #include <vector>
 
@@ -15,11 +14,10 @@ private:
 
 	SOCKET clientSocket;
 	char *IP;
-
-	bool isActive = true;
+	std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> lastPrintTime;
 
 	void addMessage(std::string message);
-	void threadTimer(std::string threadId);
+	void processDisconect();
 
 	std::string idToString();
 
@@ -30,7 +28,6 @@ public:
 	virtual ~Connection();
 
 	void clientProcessing();
-	void setIsActive(bool isActive);
 	void closeSocket();
 
 	std::string getInfo();

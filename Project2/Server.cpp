@@ -9,7 +9,6 @@
 #pragma warning(disable : 4996)
 
 Server::Server() {
-
 	adjustWsaData();
 	adjustListeningSocket();
 	bindSocketHint();
@@ -20,7 +19,6 @@ Server::~Server()
 }
 
 void Server::adjustWsaData() {
-
 	int wsaStartup = WSAStartup(ver, &wsData);
 	if (wsaStartup != 0) {
 		std::cerr << "Can't initialize winSock, Err #" << WSAGetLastError() << std::endl;
@@ -29,7 +27,6 @@ void Server::adjustWsaData() {
 }
 
 void Server::adjustListeningSocket() {
-
 	listeningSocket = socket(AF_INET, SOCK_STREAM, 0); // AF_INET - IPv4, SOCK_STREAM - USE FOR TCP, 0 - means that we use default protocol
 	if (listeningSocket == INVALID_SOCKET) {
 		std::cerr << "Can't create a listening socket, Err #" << WSAGetLastError() << std::endl;
@@ -38,9 +35,7 @@ void Server::adjustListeningSocket() {
 }
 
 void Server::bindSocketHint() {
-
 	// bind the ip address and port to a socket
-
 	sockaddr_in listeningSocketHint;
 	listeningSocketHint.sin_family = AF_INET;
 	listeningSocketHint.sin_port = htons(PORT);
@@ -52,7 +47,9 @@ Server& Server::getInstance() { // return reference for data type Server, which 
 	static Server server;
 	return server;
 }
+
 void Server::interruption_handler(int param) {
+	system("cls");
 	getInstance().stopServer();
 	system("Pause");
 	exit(0);
@@ -124,9 +121,9 @@ void Server::deleteConnection(Connection *connection) {
 }
 
 void Server::shutDownAllConnections() {
-	 mutex.lock();
+	mutex.lock();
 	for (int connectionIndex = 0; connectionIndex < connections.size(); connectionIndex++) {
 		connections[connectionIndex]->closeSocket();
 	}
-	 mutex.unlock();
+	mutex.unlock();
 }

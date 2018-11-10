@@ -6,25 +6,17 @@
 Connection::Connection(SOCKET &clientSocket, char *IP) : clientSocket(clientSocket), IP(IP) {}
 
 Connection::~Connection() {
-
-	auto &server = Server::getInstance();
-	server.deleteConnection(this);
+	Server::getInstance().deleteConnection(this);
 }
 
 void Connection::addMessage(std::string message) {
-
-	auto &server = Server::getInstance();
-	server.addMessage(message);
+	Server::getInstance().addMessage(message);
 }
 
-void Connection::threadTimer(std::string threadId) {
-	// нарушение прав на чтение wtf? ip не определен?
-	while (isActive == 1) {
-		std::string timerData = getInfo() + " 127.0.0.1"  + " idle\n";
-		std::cout << timerData;
-		addMessage(timerData);
-		Sleep(1000);
-	}
+void Connection::processDisconect() {
+	std::string connectionMessage = getInfo() + "client " + IP + " disconnected\n";
+	std::cout << connectionMessage;
+	addMessage(connectionMessage);
 }
 
 std::string Connection::idToString() {
@@ -34,34 +26,49 @@ std::string Connection::idToString() {
 }
 
 void Connection::clientProcessing() {
+	lastPrintTime = std::chrono::system_clock::now();
 
-	std::thread timerThread(&Connection::threadTimer, this, idToString());
-	timerThread.detach();
+	fd_set read_s; // Множество
+	timeval time_out; // Таймаут
+
 	std::string connectionMessage = getInfo() + "accept new client " + IP + "\n";
 	std::cout << connectionMessage;
 	addMessage(connectionMessage);
-
-	while (isActive) {
-		char clientMessage[10000];
-		int bytesReceived = recv(clientSocket, clientMessage, 1000, 0);
 	
-		if (bytesReceived == -1 || bytesReceived == 0) {
-			setIsActive(false);
-			connectionMessage = getInfo() + "client " + IP + " disconnected\n";
-			std::cout << connectionMessage;
-			addMessage(connectionMessage);
-		} else {
+	while (true) {
+		FD_ZERO(&read_s); // Обнуляем мнодество
+		FD_SET(clientSocket, &read_s); // Заносим в него наш сокет 
+		time_out.tv_sec = 0; time_out.tv_usec = 0; //Таймаут 0.0 секунды.
+
+		int select_result =  select(0, &read_s, NULL, NULL, &time_out);
+		if (select_result == SOCKET_ERROR) {
+			processDisconect();
+			break;
+		}
+
+		if (select_result != 0) {
+			char clientMessage[10000];
+			int bytesReceived = recv(clientSocket, clientMessage, 10000, 0);
+			if (bytesReceived == -1) {
+				processDisconect();
+				break;
+			}
 			connectionMessage = getInfo() + IP + " " + std::string(clientMessage, 0, bytesReceived) + "\n";
 			std::cout << connectionMessage;
 			addMessage(connectionMessage);
 			send(clientSocket, clientMessage, bytesReceived + 1, 0); //write data to socket 1-socket-descriptor 2-address 3 - buffer length
 		}
-	}
-	delete this;
-}
 
-void Connection::setIsActive(bool isActive) {
-	Connection::isActive = isActive;
+		auto end = std::chrono::system_clock::now();
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(end - lastPrintTime).count() > 1000) {
+			lastPrintTime = end;
+			std::string timerData = getInfo() + IP + " idle\n";
+			std::cout << timerData;
+			addMessage(timerData);
+		}
+	}
+
+	delete this;
 }
 
 void Connection::closeSocket() {

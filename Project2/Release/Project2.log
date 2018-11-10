@@ -1,9 +1,9 @@
 ﻿  Connection.cpp
   main.cpp
   Server.cpp
-c:\users\vlads\source\repos\project2\project2\server.cpp(80): warning C4018: <: несоответствие типов со знаком и без знака
-c:\users\vlads\source\repos\project2\project2\server.cpp(128): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\a4tec\desktop\os3\project2\server.cpp(77): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\a4tec\desktop\os3\project2\server.cpp(125): warning C4018: <: несоответствие типов со знаком и без знака
   Создание кода
-  All 511 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 480 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Создание кода завершено
-  Project2.vcxproj -> C:\Users\vlads\source\repos\Project2\Release\Server.exe
+  Project2.vcxproj -> C:\Users\a4tec\Desktop\OS3\Release\Server.exe

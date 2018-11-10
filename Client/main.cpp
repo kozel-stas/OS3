@@ -1,5 +1,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
+#pragma(push)
+#pragma warning ( disable : 4789 )
 #include <iostream>
 #include <winsock2.h> 
 #include <ws2tcpip.h>
@@ -30,11 +32,8 @@ string generateRandomString() {
 }
 
 
-int startClient() {
-	string ipAddress = "192.168.38.49";
+int startClient(const char *ip) {
 	int port = 5223;
-	//    std::cout << "Input IP address" << std::endl;
-	//    cin >> ipAddress;
 
 		//Initialize WinSock
 	WSADATA wsData;
@@ -48,6 +47,7 @@ int startClient() {
 
 	//Create socket
 	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+	
 	if (clientSocket == INVALID_SOCKET) {
 		cerr << "Can't create socket, Err #" << WSAGetLastError() << endl;
 		return -1;
@@ -57,7 +57,7 @@ int startClient() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET; // we use AF_INET for ip
 	hint.sin_port = htons(port);
-	hint.sin_addr.S_un.S_addr = inet_addr(ipAddress.c_str());
+	hint.sin_addr.S_un.S_addr = inet_addr(ip);
 
 	//Do-while loop to send and receive data
 	char buffer[1000];
@@ -67,7 +67,7 @@ int startClient() {
 	//Connect to server
 	int connectResult = connect(clientSocket, (sockaddr *)&hint, sizeof(hint));
 	if (connectResult == SOCKET_ERROR) {
-		cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
+		cout << "Can't connect to server, Err #" << WSAGetLastError() << endl;
 		WSACleanup();
 		return -1;
 	}
@@ -85,7 +85,7 @@ int startClient() {
 		int byteReceived = recv(clientSocket, buffer, 5000, 0);
 		if (byteReceived > 0) {
 			//Echo response to console
-			cout << "SERVER > " << string(buffer, 0, byteReceived) << endl;
+			cerr << "SERVER > " << string(buffer, 0, byteReceived) << endl;
 		}
 	}
 
@@ -98,6 +98,7 @@ int startClient() {
 }
 
 
-int main() {
-	return startClient();
+int main(int argc, char* argv[]) {
+	startClient(argv[1]);
+	system("Pause");
 }
